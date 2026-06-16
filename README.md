@@ -1,60 +1,169 @@
 # Laravel Esport Tournament Starter
 
-Public-safe Laravel starter for small esports tournament communities. It includes basic email/password auth, teams, tournaments, registration approval, and a demo match result flow.
+Public-safe Laravel starter for small esports tournament communities. It includes local auth, teams, tournament registration, admin approval, and a simple demo bracket flow without private SaaS or monetization features.
 
-This repository is intentionally not a mirror of any private commercial SaaS project. It excludes wallet monetization, payment providers, subscription billing, tenant rent workflows, production data, private assets, and commit history.
+This repository is intentionally shaped for public collaboration and learning. It is not a mirror of any private commercial product, and it stays inside a narrow starter scope.
 
-## Features
+## What It Includes
 
-- User registration and login
+- Email/password registration and login
 - Team creation and roster placeholders
-- Tournament creation by admins
+- Tournament creation for admins
 - Team registration requests for tournaments
-- Admin approval for registrations
+- Admin approval and rejection of registrations
 - Demo bracket generation from approved teams
 - Simple match result entry
-- SQLite-first local setup
-- Laravel Sail compatible Docker Compose
-- Demo seeder data only
+- SQLite-first local development setup
+- Laravel Sail support for Docker-based local development
 
-## Quick Start
+## Requirements
+
+- PHP 8.3+
+- Composer 2
+- Node.js 22+ and npm
+- SQLite 3
+
+Optional:
+
+- Docker Desktop or Docker Engine for Laravel Sail
+
+## Local Setup
+
+1. Install PHP and JavaScript dependencies.
 
 ```bash
 composer install
+npm ci
+```
+
+2. Create the local environment file.
+
+```bash
 cp .env.example .env
-php artisan key:generate
+```
+
+3. Create the SQLite database file used by `.env.example`.
+
+```bash
 touch database/database.sqlite
+```
+
+4. Generate the app key and prepare the database-backed session, cache, and queue tables.
+
+```bash
+php artisan key:generate
 php artisan migrate --seed
-npm install
+```
+
+5. Build frontend assets and start the local server.
+
+```bash
 npm run build
 php artisan serve
 ```
 
-Demo admin:
+The app will usually be available at [http://127.0.0.1:8000](http://127.0.0.1:8000).
 
-- Email: `admin@example.com`
-- Password: `password`
+## Laravel Sail / Docker Setup
 
-Demo user:
+Use this path if you prefer Docker-managed PHP and Node tooling. The included `compose.yaml` starts the Laravel app container plus MySQL and Mailpit services, but the default `.env.example` still points the app itself at SQLite unless you change it.
 
-- Email: `player@example.com`
-- Password: `password`
-
-## Sail
+1. Create the environment file and install PHP dependencies.
 
 ```bash
 cp .env.example .env
 composer install
+```
+
+2. Start Sail.
+
+```bash
 ./vendor/bin/sail up -d
+```
+
+3. Generate the key, create the SQLite file, migrate, and build assets.
+
+```bash
 ./vendor/bin/sail artisan key:generate
+./vendor/bin/sail artisan tinker --execute="if (! file_exists(database_path('database.sqlite'))) { touch(database_path('database.sqlite')); }"
 ./vendor/bin/sail artisan migrate --seed
-./vendor/bin/sail npm install
+./vendor/bin/sail npm ci
 ./vendor/bin/sail npm run build
 ```
 
+4. Open the app at [http://localhost](http://localhost) or `http://localhost:${APP_PORT}` if you changed `APP_PORT`.
+
+If you prefer Vite watch mode during development, use `npm run dev` locally or `./vendor/bin/sail npm run dev` with Sail.
+
+## Tests and Local Checks
+
+```bash
+composer validate --no-check-lock
+php artisan test
+npm run build
+```
+
+`phpunit.xml` uses in-memory SQLite for tests, so the test suite does not depend on the local `database/database.sqlite` file.
+
+## Demo Accounts
+
+Seeder-created demo accounts:
+
+- Admin: `admin@example.com` / `password`
+- Player: `player@example.com` / `password`
+
+These accounts are for local demos only.
+
+## Screenshots
+
+This repository does not ship production screenshots or private product images.
+
+If you want visuals in a fork or a future documentation PR, use:
+
+- Local development screenshots created from this public starter
+- Clearly labeled placeholder image slots in docs or issues
+
+Avoid fake UI images, private admin data, or screenshots from non-public systems.
+
+## Troubleshooting
+
+`database/database.sqlite` missing:
+
+- Create it with `touch database/database.sqlite` before running `php artisan migrate --seed`.
+
+`could not find driver` or SQLite connection errors:
+
+- Make sure the PHP SQLite extensions are installed and enabled for your CLI PHP runtime.
+
+Session, cache, or queue table errors after a fresh clone:
+
+- Run `php artisan migrate --seed` so the database-backed tables from `.env.example` are created.
+
+Frontend asset errors or missing `public/build` files:
+
+- Run `npm ci` and then `npm run build`.
+
+Sail command not found:
+
+- Run `composer install` first so `./vendor/bin/sail` exists.
+
+WSL or Linux permissions oddities:
+
+- Confirm the current user can write to `.env`, `database/database.sqlite`, and `storage/`.
+
 ## Public-Safety Boundary
 
-The starter deliberately has no real-money wallet, payouts, subscriptions, tenant billing, payment webhooks, provider credentials, production mail credentials, SQL dumps, logs, private screenshots, or private brand assets.
+This starter deliberately excludes:
+
+- Payment provider integrations
+- Real-money wallet logic
+- Payouts, prize finance, or billing flows
+- Subscription logic
+- Tenant monetization or private SaaS workflows
+- Production credentials, customer data, SQL dumps, and private assets
+- Private business copy, internal screenshots, and non-public branding
+
+Contributions should stay within the public starter scope: tournaments, teams, registration, approval flow, demo brackets, match results, tests, accessibility, and documentation.
 
 ## License
 
